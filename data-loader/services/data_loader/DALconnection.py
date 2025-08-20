@@ -1,12 +1,21 @@
 from pymongo import MongoClient
-
+from services.data_loader import config
 
 class Connections:
     
-    def __init__(self,connection:str,database_name:str):
-        self.client = MongoClient(connection)
-        self.db = self.client[database_name]
-    
+    def __init__(self):
+
+        self.client = None
+        self.db = None
+
+    def connection_db(self):
+        try:
+            self.client = MongoClient(config.MONGODB_HOST ,config.MONGODB_PORT)
+            self.db = self.client(config.MONGODB_DATABASE)
+            return self.db
+        except Exception as e:
+            raise ConnectionError(f"ERROR: From Connections.connection_db :{e}")
+
     def get_server_health(self):
         try:
             if not self.client:
@@ -17,9 +26,9 @@ class Connections:
             print(f"error in server health: {e}")
             return False
 
-    def show_collection(self,collection_name:str):
-        try:
-            collection =list(self.db[collection_name].find({}))
-            return collection
-        except Exception as e:
-            print(f"error in show collections {e}")
+    def disconnect(self):
+        """
+        Close database connection
+        """
+        if self.client:
+            self.client.close()
