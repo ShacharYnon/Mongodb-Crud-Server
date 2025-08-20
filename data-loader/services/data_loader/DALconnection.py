@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 
 
-
 class Connections:
     
     def __init__(self,connection:str,database_name:str):
